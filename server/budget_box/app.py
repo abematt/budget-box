@@ -24,6 +24,7 @@ import secrets
 from datetime import datetime
 from pathlib import Path
 
+import httpx
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, PlainTextResponse, Response
 
@@ -66,6 +67,13 @@ def _check_in(request: Request, battery: str | None) -> None:
         }))
     except OSError:
         pass  # a read-only or missing data dir must never break the screen
+
+
+@app.exception_handler(httpx.HTTPError)
+async def source_unavailable(request: Request, exc: httpx.HTTPError):
+    """The data source is down or restarting: a clean 502, so the device backs off and retries
+    (it keeps its last image on screen meanwhile)."""
+    return JSONResponse({"error": "data source unavailable", "detail": type(exc).__name__}, status_code=502)
 
 
 @app.get("/healthz")

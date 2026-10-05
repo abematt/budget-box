@@ -33,3 +33,14 @@ def test_unknown_view_is_404():
 
 def test_wait_answers_at_once_for_a_stale_version():
     assert client.get("/wait?v=1&timeout=5", headers=AUTH).json()["changed"] is True
+
+
+def test_source_outage_is_a_clean_502(monkeypatch):
+    import httpx
+
+    async def down(*a, **k):
+        raise httpx.ConnectError("refused")
+
+    monkeypatch.setattr(app.state.source, "wait", down)
+    r = client.get("/wait?v=1&timeout=5", headers=AUTH)
+    assert r.status_code == 502 and r.json()["error"] == "data source unavailable"
