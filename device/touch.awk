@@ -9,7 +9,8 @@ function viewer_w()     { return rot == 90 || rot == 270 ? H : W }
 function emit(g,   cmd) {
     if ((getline junk < "/mnt/us/dash/asleep") >= 0) { close("/mnt/us/dash/asleep"); return }  # asleep: ignore
     printf "%s\n", g > out; close(out)
-    cmd = "pkill -f \"/wait?v=\" >/dev/null 2>&1"; system(cmd)
+    # break dash.sh's long poll so the new page draws now (. not ?: the pattern is a regex)
+    cmd = "pkill -f \"/wait.v=\" >/dev/null 2>&1"; system(cmd)
 }
 function lift() {
     # any touch, tap or swipe, steps to the next page (pages cycle, so one gesture is enough)

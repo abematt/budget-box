@@ -30,7 +30,7 @@ arm()    { disarm; echo $(( $(cat "$RTC/since_epoch") + SAFETY )) > "$RTC/wakeal
 
 go_to_sleep() {
     touch "$ASLEEP"
-    pkill -f "/wait?v=" 2>/dev/null; pkill -f "/screen.png" 2>/dev/null
+    pkill -x curl 2>/dev/null                  # dash.sh's long poll / fetch: it pauses on $ASLEEP
     eips -f -g "$BASE/sleep.png" >/dev/null 2>&1   # full update: no ghost of the dashboard
     lipc-set-prop com.lab126.cmd wirelessEnable 0 2>/dev/null
     log "sleep"
@@ -49,6 +49,9 @@ go_to_sleep() {
     done
     disarm
     lipc-set-prop com.lab126.cmd wirelessEnable 1 2>/dev/null
+    # anything left open across the suspend is a dead TCP connection that could hang dash.sh
+    # for up to --max-time (16 min); kill it so the loop sees $ASLEEP gone at once
+    pkill -x curl 2>/dev/null
     rm -f "$ASLEEP"
     log "wake"
 }
