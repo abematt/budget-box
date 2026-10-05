@@ -60,6 +60,7 @@ with SSH; the kernel and system are untouched apart from one boot job.
 | `dash.sh` | Takes over the screen, fetches and paints pages, holds the long poll, backs off and shows "offline since" when the network drops. |
 | `touch.sh` + `touch.awk` | Reads raw touchscreen events and turns any tap into "next page". |
 | `button.sh` | Power button: draws the Budget Box screen and suspends. The next press wakes it. |
+| `loading.sh` | The spinning coin shown while waking, redrawn in place with a fast waveform. |
 
 ### Things the hardware taught me
 
@@ -86,10 +87,15 @@ with SSH; the kernel and system are untouched apart from one boot job.
   through, and `eips -c` turns out to be a partial update too. Page turns, waking and sleeping use
   a full-waveform update (`eips -f`); in-place number changes stay partial with a full refresh
   every few redraws.
-- **Instant wake.** Wi-Fi takes 20–30 s to come back after suspend, so on wake the device shows the
-  last page right away with an "Updating…" banner over its timestamp, until fresh data arrives.
+- **Waking up.** Wi-Fi takes 20–30 s to come back after suspend, so on wake the screen clears to a
+  spinning pixel-art euro coin until fresh data arrives, and taps are ignored meanwhile. The coin
+  is pure black and white and only its own box is redrawn, with the fast two-level waveform, so it
+  animates at several frames a second without flashing the screen.
 
-<p align="center"><img src="docs/screens/sleep.png" width="49%" alt="Sleep screen"></p>
+<p align="center">
+  <img src="docs/screens/sleep.png" width="49%" alt="Sleep screen">
+  <img src="docs/screens/waking.gif" width="24%" alt="Waking animation: a spinning pixel-art euro coin">
+</p>
 
 ## Run it
 

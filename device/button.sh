@@ -35,6 +35,7 @@ arm()    { disarm; echo $(( $(cat "$RTC/since_epoch") + SAFETY )) > "$RTC/wakeal
 
 go_to_sleep() {
     touch "$ASLEEP"
+    rm -f "$BASE/loading.flag"; sleep 1          # stop a waking animation before drawing over it
     pkill -x curl 2>/dev/null                  # dash.sh's long poll / fetch: it pauses on $ASLEEP
     eips -f -g "$BASE/sleep.png" >/dev/null 2>&1   # full update: no ghost of the dashboard
     lipc-set-prop com.lab126.cmd wirelessEnable 0 2>/dev/null

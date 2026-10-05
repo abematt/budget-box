@@ -11,6 +11,6 @@ fi
 mntroot rw
 cp /mnt/us/dash/dash.conf /etc/upstart/dash.conf
 mntroot ro
-chmod +x /mnt/us/dash/dash.sh /mnt/us/dash/touch.sh /mnt/us/dash/button.sh
+chmod +x /mnt/us/dash/dash.sh /mnt/us/dash/touch.sh /mnt/us/dash/button.sh /mnt/us/dash/loading.sh
 initctl reload-configuration 2>/dev/null || true
 echo "installed /etc/upstart/dash.conf — 'start dash' now, or reboot"

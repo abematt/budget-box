@@ -7,7 +7,9 @@ function viewer_x(x, y) { if (rot == 90) return H - y; if (rot == 270) return y;
 function viewer_y(x, y) { if (rot == 90) return x; if (rot == 270) return W - x; return y }
 function viewer_w()     { return rot == 90 || rot == 270 ? H : W }
 function emit(g,   cmd) {
-    if ((getline junk < "/mnt/us/dash/asleep") >= 0) { close("/mnt/us/dash/asleep"); return }  # asleep: ignore
+    # asleep or waking (coin spinning): ignore
+    if ((getline junk < "/mnt/us/dash/asleep") >= 0) { close("/mnt/us/dash/asleep"); return }
+    if ((getline junk < "/mnt/us/dash/loading.flag") >= 0) { close("/mnt/us/dash/loading.flag"); return }
     printf "%s\n", g > out; close(out)
     # break dash.sh's long poll so the new page draws now (. not ?: the pattern is a regex)
     cmd = "pkill -f \"/wait.v=\" >/dev/null 2>&1"; system(cmd)

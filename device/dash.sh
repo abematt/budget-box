@@ -20,6 +20,7 @@ SERVER="${SERVER%/}"
 URL="$SERVER/screen.png"; WAIT_URL="$SERVER/wait"; VIEWS_URL="$SERVER/views"
 GESTURE="$BASE/gesture"
 ASLEEP="$BASE/asleep"
+LOADING="$BASE/loading.flag"
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; tail -c 200000 "$LOG" > "$LOG.t" 2>/dev/null && mv "$LOG.t" "$LOG"; }
 
@@ -95,23 +96,31 @@ wait_change() {
 
 take_over_screen
 [ -f "$CUR" ] && draw "$CUR"
-rm -f "$GESTURE"
+rm -f "$GESTURE" "$LOADING"
 pkill -f "$BASE/touch.sh" 2>/dev/null; pkill -f "$BASE/button.sh" 2>/dev/null
 pkill -x hexdump 2>/dev/null; pkill -x dd 2>/dev/null
 [ -x "$BASE/touch.sh" ] && { sh "$BASE/touch.sh" & }
 [ -x "$BASE/button.sh" ] && { sh "$BASE/button.sh" & }
-# asleep (button.sh): wait it out, then redraw from scratch; 0 if we slept
+# asleep (button.sh): wait it out, then show the waking screen; 0 if we slept
 napped() {
     [ -f "$ASLEEP" ] || return 1
     while [ -f "$ASLEEP" ]; do sleep 1; done
     rm -f "$GESTURE"                            # taps made while asleep don't count
-    # straight away: the last page we had, with "Updating…" over its "as of" line, until Wi-Fi
-    # is back and the fresh image replaces it. The banner is placed for ROTATE=90 (landscape).
-    if [ -f "$CUR" ]; then
+    # A blank screen with a spinning coin (loading.sh) until Wi-Fi is back and fresh data is
+    # drawn, so nobody reads or taps a stale page. Frames are placed for ROTATE=90.
+    if [ "${ROTATE:-0}" = 90 ] && [ -f "$BASE/waking.png" ] && [ -f "$BASE/loading/pos" ]; then
+        draw_full "$BASE/waking.png"
+        touch "$LOADING"; sh "$BASE/loading.sh" &
+    elif [ -f "$CUR" ]; then
         draw_full "$CUR"
-        [ "${ROTATE:-0}" = 90 ] && [ -f "$BASE/updating.png" ] && eips -g "$BASE/updating.png" -x 992 -y 0 >/dev/null 2>&1
     fi
     backoff=15; return 0
+}
+# end the waking animation; 0 if it was running (the next draw should then be full)
+stop_loading() {
+    [ -f "$LOADING" ] || return 1
+    rm -f "$LOADING"; sleep 1                   # let loading.sh finish its current frame
+    return 0
 }
 wifi_up && load_views
 n=0; since=""; backoff=15; VERSION=""; paged=0
@@ -119,19 +128,22 @@ while :; do
     if wifi_up && fetch; then
         mv "$NEW" "$CUR"; since=""; backoff=15
         n=$((n+1))
+        stop_loading && paged=1                 # fresh data after waking: replace the coin
         # full update on a page turn and every FULL_EVERY redraws; otherwise a quiet partial one
         if [ $((n % ${FULL_EVERY:-6})) -eq 0 ] || [ $paged = 1 ]; then draw_full "$CUR"; else draw "$CUR"; fi
         paged=0
         wait_change && continue
         # the long poll ended early: a page turn or going to sleep breaks it on purpose,
         # anything else is a failure
-        # (after a nap the last page was already drawn full, so the fresh one can be partial)
+        # (after a nap the coin is spinning; the fresh page replaces it with a full update)
         if take_gesture; then paged=1; elif napped; then :; else sleep "$backoff"; fi
     else
-        napped || { take_gesture && paged=1; }
+        napped && continue                      # just woke: straight back to the network
+        take_gesture && paged=1
         rm -f "$NEW"
         [ -z "$since" ] && since="$(date '+%H:%M')" && log "fetch failed; offline since $since"
-        [ -f "$CUR" ] && draw "$CUR"
+        # no data yet: fall back to the last page (full update if it replaces the coin)
+        if stop_loading; then [ -f "$CUR" ] && draw_full "$CUR"; else [ -f "$CUR" ] && draw "$CUR"; fi
         offline_line "$since"
         sleep "$backoff"; [ "$backoff" -lt 300 ] && backoff=$((backoff * 2))
     fi
