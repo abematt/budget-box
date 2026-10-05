@@ -7,11 +7,9 @@ BASE=/mnt/us/dash
 FLAG="$BASE/loading.flag"
 DIR="$BASE/loading"
 read X Y < "$DIR/pos" || exit 0
-# Fast waveform if this eips knows it, else a plain partial update (slower, still no flash).
-WAVE=""
-for w in a2 du; do
-    if eips -g "$DIR/00.png" -x "$X" -y "$Y" -w "$w" >/dev/null 2>&1; then WAVE="-w $w"; break; fi
-done
+# A2: the fastest two-level waveform (wave_mode 6 on the PW4). eips accepts any -w name without
+# complaint, so there's nothing to probe; a gray-capable mode would be slower and flicker more.
+WAVE="-w a2"
 i=0; n=$(ls "$DIR"/*.png | wc -l); limit=$(( $(date +%s) + 120 ))
 while [ -f "$FLAG" ] && [ "$(date +%s)" -lt "$limit" ]; do
     eips -g "$DIR/$(printf %02d $i).png" -x "$X" -y "$Y" $WAVE >/dev/null 2>&1
