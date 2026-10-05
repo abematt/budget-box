@@ -88,7 +88,8 @@ with SSH; the kernel and system are untouched apart from one boot job.
   a full-waveform update (`eips -f`); in-place number changes stay partial with a full refresh
   every few redraws.
 - **Waking up.** Wi-Fi takes 20–30 s to come back after suspend, so on wake the screen clears to a
-  spinning pixel-art euro coin until fresh data arrives, and taps are ignored meanwhile. The coin
+  spinning pixel-art euro coin shedding fairy dust that arcs and falls under gravity, until fresh
+  data arrives; taps are ignored meanwhile. The animation
   is pure black and white and only its own box is redrawn, with the fast two-level waveform, so it
   animates at several frames a second without flashing the screen.
 
