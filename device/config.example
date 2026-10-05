@@ -4,4 +4,5 @@ TOKEN=<DEVICE_TOKEN from the server's .env>
 ROTATE=90        # 0 portrait · 90 / 270 landscape (pick the one matching the stand)
 HEARTBEAT=900    # seconds before the server answers a quiet long poll (keeps the clock/day honest)
 FULL_EVERY=6     # full e-ink refresh every N in-place redraws (ghosting)
+SLEEP_STATE=standby  # standby wakes on one press; mem saves more but needs two presses or a hold on the PW4
 # TOUCH_DEBUG=1  # log every raw touch to dash.log

@@ -71,10 +71,17 @@ with SSH; the kernel and system are untouched apart from one boot job.
   the power chip's interrupt counter in `/proc/interrupts`, so `button.sh` watches that. Plugging
   in the charger bumps the same counter; those presses are told apart by the charger's
   `online` flag in sysfs changing at the same moment.
-- **Real suspend, with a safety net.** Sleep is `echo mem > /sys/power/state` after arming the
-  SoC's RTC wake alarm. If the alarm or a charger plug is what woke it, it goes straight back to
-  sleep, and only the button wakes the display. If waking by button ever failed, the alarm
+- **Real suspend, with a safety net.** Sleep writes `standby` to `/sys/power/state` after arming
+  the SoC's RTC wake alarm. If the alarm or a charger plug is what woke it, it goes straight back
+  to sleep, and only the button wakes the display. If waking by button ever failed, the alarm
   still brings it back.
+- **Deep sleep swallows the first press.** In `mem`, the deepest state, a short press never reaches
+  the processor: it takes a second press or a long hold. `standby` keeps interrupt handling alive
+  and wakes on a single press, so it is the default (`SLEEP_STATE` in the device config).
+- **Requests don't survive a suspend.** A long poll left open across sleep is a dead TCP connection,
+  so the display loop would wait out curl's timeout before redrawing. The button handler kills open
+  requests on sleep and again on wake. (Also: busybox `pkill -f` takes a regex, so a pattern with
+  `?` in it silently matches nothing.)
 - **Ghosting.** A partial e-ink update only moves the pixels that changed, so earlier pages bleed
   through, and `eips -c` turns out to be a partial update too. Page turns, waking and sleeping use
   a full-waveform update (`eips -f`); in-place number changes stay partial with a full refresh

@@ -8,13 +8,18 @@
 # that counter. Plugging or unplugging the charger bumps the same counter; those are told
 # apart by bd71827_ac/online changing at the same time.
 #
-# Sleeping: a real suspend (echo mem > /sys/power/state), Wi-Fi off first. The power chip is a
+# Sleeping: a real suspend (echo $SLEEP_STATE > /sys/power/state), Wi-Fi off first. The power chip is a
 # wake source, and so is the SoC's RTC: a safety alarm every SAFETY seconds wakes the Kindle, and
 # if the button wasn't what woke it (alarm, charger) it goes straight back to sleep. If a
 # suspend ever fails outright we stay awake rather than spin.
 # While asleep, $BASE/asleep exists; dash.sh pauses on it and redraws when it disappears.
 BASE=/mnt/us/dash
+. "$BASE/config"
 ASLEEP="$BASE/asleep"
+# Sleep state for /sys/power/state. "mem" (deep) saves the most, but on the PW4 a short press
+# doesn't wake it: the power chip swallows the first press, so it takes two presses or a long
+# hold. "standby" keeps interrupt handling alive and wakes on one press; "freeze" is lighter still.
+STATE=${SLEEP_STATE:-standby}
 RTC=/sys/class/rtc/rtc1
 AC=/sys/class/power_supply/bd71827_ac/online
 SAFETY=21600                                   # 6 h
@@ -33,12 +38,12 @@ go_to_sleep() {
     pkill -x curl 2>/dev/null                  # dash.sh's long poll / fetch: it pauses on $ASLEEP
     eips -f -g "$BASE/sleep.png" >/dev/null 2>&1   # full update: no ghost of the dashboard
     lipc-set-prop com.lab126.cmd wirelessEnable 0 2>/dev/null
-    log "sleep"
+    log "sleep ($STATE)"
     sleep 2
     while :; do
         b0=$(count); a0=$(alarms); c0=$(ac)
         arm; sync
-        if ! echo mem > /sys/power/state 2>/dev/null; then
+        if ! echo "$STATE" > /sys/power/state 2>/dev/null; then
             log "suspend failed; staying awake"; break
         fi
         sleep 1
