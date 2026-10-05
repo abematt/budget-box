@@ -1,0 +1,7 @@
+# /mnt/us/dash/config on the Kindle. Plain shell variables, sourced by the scripts.
+SERVER=https://budgetbox.example.com   # the budget-box service, no trailing slash
+TOKEN=<DEVICE_TOKEN from the server's .env>
+ROTATE=90        # 0 portrait · 90 / 270 landscape (pick the one matching the stand)
+HEARTBEAT=900    # seconds before the server answers a quiet long poll (keeps the clock/day honest)
+FULL_EVERY=6     # full e-ink refresh every N in-place redraws (ghosting)
+# TOUCH_DEBUG=1  # log every raw touch to dash.log

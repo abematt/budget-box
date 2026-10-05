@@ -1,0 +1,4 @@
+# Caddy site block. deploy/push.sh --infra writes it with the domain from .env.
+{$DOMAIN} {
+    reverse_proxy budget-box:8000
+}

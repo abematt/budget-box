@@ -1,0 +1,57 @@
+{
+ "title": "Alex \u00b7 Oct",
+ "month": "2026-10",
+ "month_short": "Oct",
+ "next_month_short": "Nov",
+ "day": 15,
+ "days_in_month": 31,
+ "buckets": [
+  {
+   "label": "Alex's spending",
+   "cap": 900.0,
+   "spent": 816.32,
+   "left": 83.68,
+   "over": false,
+   "is_current": true,
+   "day": 15,
+   "dim": 31,
+   "w_spent": 180.57,
+   "w_allow": 92.49,
+   "w_left": -88.08,
+   "w_days_left": 4,
+   "w_days": 7,
+   "w_end": "2026-10-18"
+  }
+ ],
+ "nudges": [
+  {
+   "text": "Sam: 2 transactions waiting to be sorted",
+   "urgent": true
+  },
+  {
+   "text": "Alex: last added expenses 3 days ago",
+   "urgent": true
+  }
+ ],
+ "personal": true,
+ "spent": 816.32,
+ "cap": 900.0,
+ "breakdown": [
+  [
+   "Bills",
+   840.0
+  ],
+  [
+   "Groceries",
+   376.16
+  ],
+  [
+   "Other",
+   309.14
+  ],
+  [
+   "Eating out",
+   131.02
+  ]
+ ]
+}

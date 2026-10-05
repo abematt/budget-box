@@ -1,0 +1,52 @@
+{
+ "title": "Oct",
+ "month": "2026-10",
+ "month_short": "Oct",
+ "next_month_short": "Nov",
+ "day": 15,
+ "days_in_month": 31,
+ "buckets": [
+  {
+   "label": "Groceries",
+   "cap": 550.0,
+   "spent": 796.75,
+   "left": -246.75,
+   "over": true,
+   "is_current": true,
+   "day": 15,
+   "dim": 31,
+   "w_spent": 234.77,
+   "w_allow": 20.56,
+   "w_left": -214.21,
+   "w_days_left": 4,
+   "w_days": 7,
+   "w_end": "2026-10-18"
+  },
+  {
+   "label": "Eating out",
+   "cap": 400.0,
+   "spent": 320.05,
+   "left": 79.95,
+   "over": false,
+   "is_current": true,
+   "day": 15,
+   "dim": 31,
+   "w_spent": 59.99,
+   "w_allow": 82.1,
+   "w_left": 22.11,
+   "w_days_left": 4,
+   "w_days": 7,
+   "w_end": "2026-10-18"
+  }
+ ],
+ "nudges": [
+  {
+   "text": "Sam: 2 transactions waiting to be sorted",
+   "urgent": true
+  },
+  {
+   "text": "Alex: last added expenses 3 days ago",
+   "urgent": true
+  }
+ ]
+}

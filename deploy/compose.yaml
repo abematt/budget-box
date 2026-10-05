@@ -1,0 +1,23 @@
+# budget-box on a box with a shared Caddy that joins apps over the external "web" network.
+# Run from the repo root on the server:  docker compose -f deploy/compose.yaml up -d --build
+name: budget-box
+
+services:
+  app:
+    build:
+      context: ..
+    restart: unless-stopped
+    env_file: ../.env
+    volumes:
+      - data:/data            # status.json: the device's last check-in
+    networks:
+      web:
+        aliases: [budget-box]
+    # no ports: reachable only through the reverse proxy
+
+volumes:
+  data:
+
+networks:
+  web:
+    external: true
